@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:chuonchuon/shared_preferences/user_prefs.dart';
 import 'package:flutter/material.dart';
 
 
@@ -14,15 +15,20 @@ class SplashScreen extends StatefulWidget{
 }
 class _SplashScreenState extends State<SplashScreen>{
   bool _isLogin = false;
+  String _token = "null";
 
   @override
   void initState(){
     // TODO: implement initState
     super.initState();
-
+  _loadPreferences();
   }
 
-
+  _loadPreferences() async {
+    await UserPrefs.init();
+    _isLogin = UserPrefs.getLoginStatus();
+    _token = UserPrefs.getToken();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:chuonchuon/screens/city_weather.dart';
 import 'package:chuonchuon/screens/login.dart';
+import 'package:chuonchuon/shared_preferences/user_prefs.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -26,17 +29,26 @@ class _HomeState extends State<Home>{
   CurrentWeather? currentWeather;
   final Color _background = const Color.fromRGBO(16, 16, 59, 1);
   double sunPercent = 0.5;
+  bool _isLogin = false;
+
   @override
   void initState() {
     super.initState();
     _loadLocationPreferences();
     _formatWeatherObject();
+
+    _getLogin();
   }
 
   _loadLocationPreferences() async {
     await LocationPreferences.init();
     await WeatherPrefs.init();
     await StuffsPrefs.init();
+    await UserPrefs.init();
+  }
+
+  _getLogin(){
+    _isLogin = UserPrefs.getLoginStatus();
   }
 
   _formatWeatherObject(){
@@ -58,18 +70,26 @@ class _HomeState extends State<Home>{
           IconButton(
             icon: const Icon(Icons.search_sharp,size: 30, color: Colors.white),
             onPressed: (){
-              Get.snackbar(
-                "Chuồn Chuồn",
-                "Search Activate",
-                snackPosition: SnackPosition.BOTTOM,
-              );
+              // Get.snackbar(
+              //   "Chuồn Chuồn",
+              //   "Search Activate",
+              //   snackPosition: SnackPosition.BOTTOM,
+              // );
+              Get.to(()=> const CitySearch());
             },
           ),
+          _isLogin == false ?
           IconButton(
               onPressed: (){
                 Get.to( () => const Login());
               },
               icon: const Icon(Icons.account_circle))
+          : IconButton(
+              onPressed: (){
+                _logout();
+              },
+              icon: const Icon(Icons.logout)
+          )
         ],
       ),
       body: SlidingUpPanel(
@@ -280,8 +300,17 @@ class _HomeState extends State<Home>{
 
     double percent = current/total;
     return percent > 0 && percent <= 1 ? percent : 1;
+  }
 
-
+  _logout() async {
+    Get.snackbar(
+        'Chuồn chuồn',
+        'Đăng xuất thành công'
+    );
+    await UserPrefs.setLoginStatus(false);
+    await Timer(const Duration(seconds: 2), () => setState((){
+      _isLogin = false;
+    }));
   }
 }
 

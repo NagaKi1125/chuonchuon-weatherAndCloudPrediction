@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:chuonchuon/models/weather_hourly.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:chuonchuon/models/weather_daily.dart';
@@ -32,6 +34,7 @@ class _DailyDetailsState extends State<DailyDetails>{
 
   TooltipBehavior? _tooltipBehavior;
   int _active = 1;
+  int _itemActive = 0;
 
   @override
   void initState() {
@@ -68,7 +71,7 @@ class _DailyDetailsState extends State<DailyDetails>{
             backgroundColor: _background,
             elevation: 0,
             title: const Text(
-              'Chi tiết dự báo thời tiết theo ngày',
+              'Trong 7 ngày tới',
               style: TextStyle(
 
               ),
@@ -85,34 +88,45 @@ class _DailyDetailsState extends State<DailyDetails>{
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                  _buildTopWidget(obj: listDaily[_itemActive]),
                   Container(
                     padding: const EdgeInsets.fromLTRB(8, 15, 8, 10),
+                    margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(.6),
+                      // color: Colors.white.withOpacity(.6),
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.white),
+                      // border: Border.all(color: Colors.white),
                     ),
                     width: size.width * .9,
-                    height: 150,
+                    height: 130,
                     child: ListView.separated(
                       separatorBuilder: (BuildContext context, int index){
-                        return const SizedBox(width: 5,);
+                        return const SizedBox(width: 10,);
                       },
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
                       itemCount: listDaily.length,
                       itemBuilder: (BuildContext context, int index){
-                        double temp = (listDaily[index].tempMin + listDaily[index].tempMax) /2;
-                        return _buildHourlyDetails(
-                          active: index == 0 ? true : false,
-                          time: listDaily[index].dt,
-                          temp: '${temp.round()}°C',
-                          icon: listDaily[index].weatherIcon,
-                          weather: listDaily[index].weatherDescription,
+                        return InkWell(
+                          onTap: (){
+                            setState(() {
+                              _itemActive = index;
+                            });
+                          },
+                          child: _buildHourlyDetails(
+                            active: index == _itemActive ? true : false,
+                            time: listDaily[index].dt,
+                            temp: '${listDaily[index].tempMax.round()}/${listDaily[index].tempMin.round()}°C',
+                            icon: listDaily[index].weatherIcon,
+                          ),
                         );
                       },
                     ),
                   ),
+
+                  _buildHeadingTitle(title: 'Các chỉ số cuộc sống'),
+                  _buildElementWeather(obj: listDaily[_itemActive]),
+
                   Padding(
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                     child: SingleChildScrollView(
@@ -187,10 +201,8 @@ class _DailyDetailsState extends State<DailyDetails>{
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 700),
                     child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white38,
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
+                      decoration: const BoxDecoration(
+                        color: Colors.transparent,
                       ),
                       child: DailyLineChart(type: _active, tooltipBehavior: _tooltipBehavior!,),
                     ),
@@ -199,6 +211,136 @@ class _DailyDetailsState extends State<DailyDetails>{
               ),
             ),
           )
+      ),
+    );
+  }
+
+  Widget _buildHeadingTitle({required String title}){
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(5, 10, 0, 5),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopWidget({required DailyForecast obj}){
+    return AnimatedContainer(
+      curve: Curves.fastOutSlowIn,
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+      duration: const Duration(milliseconds: 800),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            obj.dt,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.white,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: Image.network(obj.weatherIcon, fit: BoxFit.contain,),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '${obj.tempMax.round()} /',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 28,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        '${obj.tempMin.round()} °C',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10,),
+                  Text(
+                    obj.weatherDescription,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHourlyDetails({required bool active, required String time,
+    required String temp, required String icon}){
+    Color textColor = active == false ? Colors.white60 : _background;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 800),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: active == true ? Colors.white38 : Colors.transparent),
+        color: active == true ? Colors.white : const Color.fromRGBO(30, 31, 69, 1),
+        boxShadow: [
+          active == true ?
+          BoxShadow(
+            color: Colors.white.withOpacity(.6),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(0,0),
+          ) : const BoxShadow(),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            // "${time.split(" ")[0]}\n${time.split(" ")[1]}",
+              time.split(' ')[0],
+              style: TextStyle(
+                color: textColor,
+                fontSize: 14,
+              )),
+          SizedBox(
+            height: 20,
+            width: 20,
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.lightBlueAccent.withOpacity(.3),
+              child: Image.network(icon),
+            ),
+          ),
+          Text(
+              temp,
+              style: TextStyle(
+                color: textColor,
+              )),
+        ],
       ),
     );
   }
@@ -222,28 +364,134 @@ class _DailyDetailsState extends State<DailyDetails>{
     );
   }
 
-  Widget _buildHourlyDetails({required bool active, required String time, required String temp,
-    required String icon, required String weather}){
-
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: active == true ? Colors.white : Colors.transparent),
-        color: active == true ? Colors.white.withOpacity(.5) : Colors.transparent,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(time),
-          SizedBox(width: 60, height: 60 ,child: Image.network(icon)),
-          Text(weather, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w400),),
-          Text(temp),
-        ],
-      ),
+  Widget _buildElementWeather({required DailyForecast obj}){
+    // return Text(obj.dt);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        AnimatedContainer(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          duration: const Duration(milliseconds: 700),
+          decoration: BoxDecoration(
+            // border: Border.all(color: Colors.white),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              _buildItemDailySocial(title: "Bình minh:", value: obj.sunrise),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Hoàng hôn", value: obj.sunset),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Trăng lên:", value: obj.moonrise),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Trăng hạ:", value: obj.moonset),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Pha Trăng:", value: _getMoonPhase(phase: obj.moonPhase)),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Xác suất mưa:", value: _precipitation(pop: obj.pop)),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Hướng gió:", value: _windDirection(degree: obj.windDeg)),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Sức gió:", value: '${obj.windSpeed} m/s'),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Độ ẩm:", value: '${obj.humidity}%'),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Chỉ số UV:", value: _detectUV(uvi: obj.uvi)),
+              const SizedBox(height: 10),
+              _buildItemDailySocial(title: "Áp suất không khí", value: "${obj.pressure} hPa"),
+            ],
+          ),
+        ),
+      ],
     );
   }
+
+  Widget _buildItemDailySocial({required String title, required String value}){
+    double fontSize = 13;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+            title,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: fontSize,
+            )
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+          ),
+        )
+      ],
+    );
+  }
+
+  String _getMoonPhase({required double phase}){
+    String text = '';
+    if (phase == 0 && phase == 1){
+      text = "Trăng non (sóc)";  
+    } else if(phase == 0.25) {
+      text = "Bán nguyệt thượng huyền";
+    } else if(phase == 0.5) {
+      text = "Trăng vọng";
+    }else if(phase == 0.75) {
+      text = "Trăng cuối quý";
+    }else if(phase > 0 && phase < 0.25) {
+      text = "Lưỡi liềm hạ huyền";
+    }else if(phase > 0.25 && phase < 0.5) {
+      text = "Trăng khuyết hạ huyền";
+    }else if(phase > 0.5 && phase < 0.75) {
+      text = "Trăng khuyết thượng huyền";
+    }else if(phase > 0.75 && phase < 1) {
+      text = "Lưỡi liềm thượng huyền";
+    }
+    return text;
+  }
+
+  String _precipitation({required double pop}){
+    String text = "";
+    double height = 0;
+    pop = pop * 100;
+    if(pop < 20){
+      text = "Không có mưa";
+    }else if(pop >=20 && pop < 30){
+      text = "Khả năng thấp";
+    }else if(pop >= 30 && pop < 50){
+      text = "Có thể có mưa";
+    }else{
+      text = "Mưa";
+    }
+
+    return '${pop.round()}% - $text';
+  }
+
+  String _windDirection({required int degree}){
+    List<String> _directions = ["N - Bắc", "NNE - Bắc Đông Bắc", "NE - Đông Bắc", "ENE - Đông Đông Bắc", "E - Đông",
+      "ESE - Đông Đông Nam", "SE - Đông Nam", "SSE - Nam Đông Nam", "S - Nam", "SSW - Nam Tây Nam",
+      "SW - Tây Nam", "WSW - Tây Tây Nam", "W - Tây", "WNW - Tây Tây Bắc",
+      "NW - Tây Bắc", "NNW - Bắc Tây Bắc"];
+    int val = ((degree / 22.5) + 0.5).round();
+
+    return _directions[(val % 16)];
+  }
+
+  String _detectUV({required double uvi}){
+    String text = "";
+    if(uvi >= 0 && uvi <= 2){
+      text = "Thấp";
+    }else if(uvi >= 8 && uvi <= 10){
+      text = "Gây hại";
+    }else if(uvi >= 11){
+      text = "Rất nguy hiểm";
+    }else{
+      text = "Bình thường";
+    }
+    return "$uvi - $text";
+  }
+
 
 }
 

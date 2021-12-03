@@ -68,7 +68,7 @@ class _HourlyDetailsState extends State<HourlyDetails>{
           backgroundColor: _background,
           elevation: 0,
           title: const Text(
-            'Chi tiết dự báo thời tiết theo giờ',
+            'Trong 48 giờ tiếp theo',
             style: TextStyle(
 
             ),
@@ -181,10 +181,10 @@ class _HourlyDetailsState extends State<HourlyDetails>{
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 700),
                   child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white38,
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
+                      decoration: const BoxDecoration(
+                        color: Colors.transparent,
+                        // border: Border.all(color: Colors.white),
+                        // borderRadius: BorderRadius.circular(20),
                       ),
                       child: HourlyLineChart(type: _active, tooltipBehavior: _tooltipBehavior!,),
                   ),
@@ -217,6 +217,7 @@ class _HourlyDetailsState extends State<HourlyDetails>{
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         AnimatedContainer(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           duration: const Duration(milliseconds: 700),
           decoration: BoxDecoration(
             // border: Border.all(color: Colors.white),
@@ -224,29 +225,17 @@ class _HourlyDetailsState extends State<HourlyDetails>{
           ),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      const Text(
-                        'Xác suất mưa',
-                        style: TextStyle(
-                          color: Colors.white,
-                        )
-                      ),
-                      _precipitation(pop: obj.pop),
-                    ],
-                  ),
-
-                  const Text(
-                    'Hướng gió',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              )
+              _buildItemHourlySocial(title: "Xác suất mưa:", value: _precipitation(pop: obj.pop)),
+              const SizedBox(height: 10),
+              _buildItemHourlySocial(title: "Hướng gió:", value: _windDirection(degree: obj.windDeg)),
+              const SizedBox(height: 10),
+              _buildItemHourlySocial(title: "Sức gió:", value: '${obj.windSpeed} m/s'),
+              const SizedBox(height: 10),
+              _buildItemHourlySocial(title: "Độ ẩm:", value: '${obj.humidity}%'),
+              const SizedBox(height: 10),
+              _buildItemHourlySocial(title: "Chỉ số UV:", value: _detectUV(uvi: obj.uvi)),
+              const SizedBox(height: 10),
+              _buildItemHourlySocial(title: "Áp suất không khí", value: "${obj.pressure} hPa")
             ],
           ),
         ),
@@ -254,7 +243,30 @@ class _HourlyDetailsState extends State<HourlyDetails>{
     );
   }
 
-  Widget _precipitation({required double pop}){
+  Widget _buildItemHourlySocial({required String title, required String value}){
+    double fontSize = 13;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+          )
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontSize,
+          ),
+        )
+      ],
+    );
+  }
+
+  String _precipitation({required double pop}){
     String text = "";
     double height = 0;
     pop = pop * 100;
@@ -268,21 +280,32 @@ class _HourlyDetailsState extends State<HourlyDetails>{
       text = "Mưa";
     }
 
-    return Text(
-      '$text: ${pop.round()}%',
-      style: const TextStyle(
-        color: Colors.white,
-      ),
-    );
+    return '${pop.round()}% - $text';
 
   }
 
   String _windDirection({required int degree}){
-    List<String> _directions = ["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S",
-      "SSW","SW","WSW","W","WNW","NW","NNW"];
+    List<String> _directions = ["N - Bắc", "NNE - Bắc Đông Bắc", "NE - Đông Bắc", "ENE - Đông Đông Bắc", "E - Đông",
+      "ESE - Đông Đông Nam", "SE - Đông Nam", "SSE - Nam Đông Nam", "S - Nam", "SSW - Nam Tây Nam",
+      "SW - Tây Nam", "WSW - Tây Tây Nam", "W - Tây", "WNW - Tây Tây Bắc",
+      "NW - Tây Bắc", "NNW - Bắc Tây Bắc"];
     int val = ((degree / 22.5) + 0.5).round();
 
     return _directions[(val % 16)];
+  }
+
+  String _detectUV({required double uvi}){
+    String text = "";
+    if(uvi >= 0 && uvi <= 2){
+      text = "Thấp";
+    }else if(uvi >= 8 && uvi <= 10){
+      text = "Gây hại";
+    }else if(uvi >= 11){
+      text = "Rất nguy hiểm";
+    }else{
+      text = "Bình thường";
+    }
+    return "$uvi - $text";
   }
 
   Widget _buildButton({required String name, required bool active}){

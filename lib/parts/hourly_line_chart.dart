@@ -75,6 +75,7 @@ class _HourlyLineChartState extends State<HourlyLineChart>{
             yValueMapper: (TempData data, _) => data.temps.round(),
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.orangeAccent,
@@ -110,6 +111,7 @@ class _HourlyLineChartState extends State<HourlyLineChart>{
               yValueMapper: (HumidityData data, _) => data.humi,
               dataLabelSettings: const DataLabelSettings(
                 isVisible: true,
+                color: Colors.black26,
               ),
               enableTooltip: true,
               color: Colors.lightBlueAccent,
@@ -144,6 +146,7 @@ class _HourlyLineChartState extends State<HourlyLineChart>{
             yValueMapper: (WindSpeedData data, _) => data.windSpeed,
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.greenAccent,

@@ -4,7 +4,7 @@ class StuffsPrefs {
   static SharedPreferences? _prefs;
   static const _keyMainURL = "_keyMainURL";
   static const _keyWeatherURL = "_keyWeatherURL";
-  static const String _mainURL = "http://tempv-weather.herokuapp.com/api/";
+  static const String _mainURL = "https://admin-chuonchuon.herokuapp.com/api/";
 
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();

@@ -44,6 +44,7 @@ dependencies:
   tflite: any
   image_picker:
   percent_indicator: ^3.4.0
+  country_state_city_picker: ^1.2.8
 
 dev_dependencies:
   flutter_test:

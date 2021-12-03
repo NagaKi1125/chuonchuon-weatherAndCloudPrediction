@@ -46,7 +46,6 @@ class _DailyLineChartState extends State<DailyLineChart>{
         (json.decode(WeatherPrefs.getDailyForecastJson()) as List).map((e) =>
             DailyForecast.fromJson(e)).toList();
     for(var i =0; i < listDaily.length; i++){
-      // double temp = (listDaily[i].tempMin + listDaily[i].tempMax) /2;
       minMaxList.add(TempDataMinMax(listDaily[i].dt,listDaily[i].tempMin, listDaily[i].tempMax ));
       dayNightList.add(TempDataDayNight(
           listDaily[i].dt,listDaily[i].tempMorn, listDaily[i].tempDay,
@@ -79,6 +78,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (TempDataMinMax data, _) => data.max.round(),
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.orangeAccent,
@@ -92,6 +92,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (TempDataMinMax data, _) => data.min.round(),
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.lightBlueAccent,
@@ -131,6 +132,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (TempDataDayNight data, _) => data.morn.round(),
             dataLabelSettings: const DataLabelSettings(
               isVisible: false,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.lightBlue,
@@ -144,6 +146,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (TempDataDayNight data, _) => data.day.round(),
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.orangeAccent,
@@ -157,6 +160,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (TempDataDayNight data, _) => data.eve.round(),
             dataLabelSettings: const DataLabelSettings(
               isVisible: false,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.greenAccent,
@@ -170,6 +174,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (TempDataDayNight data, _) => data.night.round(),
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.white38,
@@ -205,6 +210,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (HumidityData data, _) => data.humi,
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.lightBlueAccent,
@@ -239,6 +245,7 @@ class _DailyLineChartState extends State<DailyLineChart>{
             yValueMapper: (WindSpeedData data, _) => data.windSpeed,
             dataLabelSettings: const DataLabelSettings(
               isVisible: true,
+              color: Colors.black26,
             ),
             enableTooltip: true,
             color: Colors.greenAccent,

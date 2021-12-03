@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:chuonchuon/shared_preferences/location_preferences.dart';
 import 'package:chuonchuon/shared_preferences/stuff_prefs.dart';
+import 'package:chuonchuon/shared_preferences/user_prefs.dart';
 import 'package:chuonchuon/shared_preferences/weather_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,6 +39,14 @@ _loadPreferences() async {
   await LocationPreferences.init();
   await WeatherPrefs.init();
   await StuffsPrefs.init();
+  await UserPrefs.init();
+
+  if((UserPrefs.getLoginStatus()==false) || (UserPrefs.getLoginStatus() == null)){
+    await UserPrefs.setLoginStatus(false);
+  }else{
+    await UserPrefs.setLoginStatus(true);
+  }
+
 }
 
 Future<void> locationServices() async {

@@ -1,4 +1,7 @@
 import 'package:chuonchuon/screens/camera.dart';
+import 'package:chuonchuon/screens/login.dart';
+import 'package:chuonchuon/shared_preferences/stuff_prefs.dart';
+import 'package:chuonchuon/shared_preferences/user_prefs.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,11 +22,19 @@ class NavigationDrawerWidget extends StatefulWidget {
 }
 class _NavigationState extends State<NavigationDrawerWidget>{
   final padding = const EdgeInsets.symmetric(horizontal: 20);
+  bool _isLogin = false;
+  String _token = "null";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadPreferences();
+  }
+  _loadPreferences() async {
+    await UserPrefs.init();
+    _isLogin = UserPrefs.getLoginStatus();
+    _token = UserPrefs.getToken();
   }
 
   @override
@@ -36,11 +47,16 @@ class _NavigationState extends State<NavigationDrawerWidget>{
           padding: EdgeInsets.zero,
           children: [
             const SizedBox(height: 30,),
+            _isLogin == false ?
             buildUserPart(
               name: 'Chuồn chuồn',
               email: 'chuonchuon.chuonchuon@vku.udn.vn',
               ava: 'assets/sun.png',
-            ),
+            ):
+            buildUserPart(
+                name: UserPrefs.getUserName(),
+                email: UserPrefs.getUserEmail(),
+                ava: 'assets/sun.png'),
             const Divider(color: Colors.black26),
             buildMenuItemIconImage(
               text: "Thời tiết hiện tại",
@@ -128,22 +144,27 @@ class _NavigationState extends State<NavigationDrawerWidget>{
         leading: ImageIcon(AssetImage(icon), color: active == 1 ? color : _default,),
         title: Text(text,style: TextStyle(color: active == 1 ? color : _default, fontWeight: FontWeight.bold, fontSize: 16)),
         onTap: (){
-          if(navigate == 0){
+          if(_isLogin == true){
+            if(navigate == 0){
 
-          } else if(navigate == 1){
-            Get.to(() => const Home());
-          }else if(navigate == 2){
-            Get.to(() => const HourlyDetails());
-          }else if(navigate == 3){
-            Get.to(() => const DailyDetails());
-          } else if(navigate == 4){
-            Get.to(() => TakePictureScreen(camera: cameras));
-          } else {
-            Get.snackbar(
+            }else if(navigate == 1){
+              Get.to(() => const Home());
+            }else if(navigate == 2){
+              Get.to(() => const HourlyDetails());
+            }else if(navigate == 3){
+              Get.to(() => const DailyDetails());
+            } else if(navigate == 4){
+              Get.to(() => TakePictureScreen(camera: cameras));
+            } else {
+              Get.snackbar(
                 "Chuồn chuồn",
                 'Chuyển tiếp đến "$text"', snackPosition: SnackPosition.BOTTOM,
-            );
+              );
+            }
+          }else{
+            Get.to(() => const Login());
           }
+
         },
 
         hoverColor: _hoverColor,

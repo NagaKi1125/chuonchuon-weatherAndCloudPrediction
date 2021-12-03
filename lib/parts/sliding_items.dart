@@ -23,6 +23,7 @@ class _SlidingWidgetState extends State<SlidingWidget> {
   List<DailyForecast>? listDaily;
   List<HourlyForecast>? listHourly;
 
+
   @override
   void initState() {
     // TODO: implement initState
@@ -72,12 +73,12 @@ class _SlidingWidgetState extends State<SlidingWidget> {
                 // uns
                 _buildListTileDetails(
                   icon: 'assets/icons/sunrise.png',
-                  title: "Mặt trời mọc",
+                  title: "Bình minh",
                   value: currentWeather!.sunrise,
                 ),
                 _buildListTileDetails(
                   icon: 'assets/icons/sunset.png',
-                  title: "Mặt trời lặn",
+                  title: "Hoàng hôn",
                   value: currentWeather!.sunset,
                 ),
 
@@ -173,8 +174,10 @@ class _SlidingWidgetState extends State<SlidingWidget> {
   }
 
   String _windDirection({required int degree}){
-    List<String> _directions = ["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S",
-      "SSW","SW","WSW","W","WNW","NW","NNW"];
+    List<String> _directions = ["N - Bắc", "NNE - Bắc Đông Bắc", "NE - Đông Bắc", "ENE - Đông Đông Bắc", "E - Đông",
+      "ESE - Đông Đông Nam", "SE - Đông Nam", "SSE - Nam Đông Nam", "S - Nam", "SSW - Nam Tây Nam",
+      "SW - Tây Nam", "WSW - Tây Tây Nam", "W - Tây", "WNW - Tây Tây Bắc",
+      "NW - Tây Bắc", "NNW - Bắc Tây Bắc"];
     int val = ((degree / 22.5) + 0.5).round();
 
     return _directions[(val % 16)];
